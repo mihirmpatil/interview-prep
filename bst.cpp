@@ -1,5 +1,6 @@
 #include <iostream>
 #include <climits>
+#include <vector>
 #include <stdlib.h>
 
 using namespace std;
@@ -23,6 +24,25 @@ int is_bst(node *root, int min, int max)
 		return (is_bst(root->left, min, root->value) && (is_bst(root->right, root->value, max)));
 }
 
+
+void printAllPaths(node *root, vector<int>& s)
+{
+	if (root == NULL)
+		return;
+
+	if (root->left == NULL && root->right == NULL)
+	{
+		vector<int>::iterator it = s.begin();
+		for (;it!=s.end();++it)
+			cout << *it << " ";
+		cout << root->value << endl;
+		return;
+	}
+	s.push_back(root->value);
+	printAllPaths(root->left, s);
+	printAllPaths(root->right, s);
+	s.pop_back();
+}
 
 void insert(node ** tree, node * item) 
 {
@@ -64,6 +84,8 @@ int main()
 	printout(root);
 
 	cout << "Is BST - " << is_bst(root, INT_MIN, INT_MAX) << endl;
+	vector<int> s;
+	printAllPaths(root, s);
 	return 0;
 }
 	
