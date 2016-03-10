@@ -81,6 +81,18 @@ node* reverseIterative(node *head) {
 	return prev;
 }
 
+node* reverseRecursive(node *head) {
+	if (head==NULL)
+		return NULL;
+	if (head->next == NULL)
+		return head;
+	node *temp = head->next;
+	head->next = NULL;
+	node *n = reverseRecursive(temp);
+	temp->next = head;
+	return n;
+}
+
 int main() {
 	/*vector<int> v;
 	v.push_back(1);
@@ -107,7 +119,7 @@ int main() {
 	for (i=0;i<=10;i++)
 		head = append(head, rand()%1000);
 	printList(head);
-	head = reverseIterative(head);
+	head = reverseRecursive(head);
 	printList(head);
 
 	return 0;
