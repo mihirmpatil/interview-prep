@@ -41,8 +41,48 @@ void remove_dups(vector<int>& v) {
 		cout << "Vector: " << *it << endl;
 }
 
+struct _node {
+	int val;
+	struct _node *next;
+};
+
+typedef struct _node node;
+
+node* append(node *head, int v) {
+	node *temp = head;
+	node *n = (node*)malloc(sizeof(node));
+	n->val = v;
+	n->next = NULL;
+	while(temp->next!=NULL)
+		temp = temp->next;
+	temp->next = n;
+	return head;
+}
+
+void printList(node *head) {
+	node *temp = head;
+	while (temp!=NULL) {
+		cout << temp->val << " ";
+		temp = temp->next;
+	}
+	cout << endl;
+}
+
+node* reverseIterative(node *head) {
+	node *prev = NULL; 
+	node *curr = head;
+	node *temp;
+	while (curr!=NULL) {
+		temp = curr->next;
+		curr->next = prev;
+		prev = curr;
+		curr = temp;
+	}
+	return prev;
+}
+
 int main() {
-	vector<int> v;
+	/*vector<int> v;
 	v.push_back(1);
 	v.push_back(1);
 	v.push_back(13);
@@ -58,6 +98,17 @@ int main() {
 	v.push_back(12);
 	v.push_back(10);
 	remove_dups(v);
+*/
+	
+	node *head = (node*)malloc(sizeof(node));
+	head->val = 1;
+	head->next = NULL;
+	int i;
+	for (i=0;i<=10;i++)
+		head = append(head, rand()%1000);
+	printList(head);
+	head = reverseIterative(head);
+	printList(head);
 
 	return 0;
 }
