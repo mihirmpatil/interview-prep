@@ -1,4 +1,4 @@
-
+// https://leetcode.com/discuss/51129/10-lines-76ms-easy-c-solution-updated-function-signature
 
 // Correct but get TLE. O(n^2) solution
 class Solution {
