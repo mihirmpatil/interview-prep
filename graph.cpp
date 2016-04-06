@@ -1,49 +1,54 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <unordered_map>
+#include <map>
 
 using namespace std;
-/*
+
 class Vertex {
 	public:
 		int id;
 
+		Vertex() {}
 		Vertex(int x) {
 			id = x;
 		}
 
-		bool operator==(const Vertex& rhs) {
-			return this->id == rhs.id;
+		bool operator==(const Vertex& rhs) const {
+			return id == rhs.id;
+		}
+		
+		bool operator<(const Vertex& rhs) const {
+			return id < rhs.id;
 		}
 };
-*/
+
 
 class Graph {
 	private:
 		// adjacency lists for representation
-		unordered_map<int, vector<int>> fwd_edges;
-		unordered_map<int, vector<int>> back_edges;
+		map<Vertex, vector<Vertex> > fwd_edges;
+		map<Vertex, vector<Vertex> > back_edges;
 
 	public:
-		void addVertex(int id);
-		void addEdge(int a, int b);
+		void addVertex(Vertex id);
+		void addEdge(Vertex a, Vertex b);
 		bool isEmpty();
-		int getARootNode();
-		void deleteRootNode(int a);
+		Vertex getARootNode();
+		void deleteRootNode(Vertex a);
 		void display();
 };
 
-void Graph::addVertex(int id) {
-	vector<int> temp;
+void Graph::addVertex(Vertex id) {
+	vector<Vertex> temp;
 	fwd_edges.insert(make_pair(id, temp));
 	back_edges.insert(make_pair(id, temp));
 }
 
 // Add edge from Vertex a to Vertex b
 // Assumes that both vertices exist in the graph
-void Graph::addEdge(int a, int b) {
-	vector<int> temp = fwd_edges[a];
+void Graph::addEdge(Vertex a, Vertex b) {
+	vector<Vertex> temp = fwd_edges[a];
 	temp.push_back(b);
 	fwd_edges[a] = temp;
 	back_edges[b].push_back(a);
@@ -54,57 +59,58 @@ bool Graph::isEmpty() {
 }
 
 void Graph::display() {
-	unordered_map< int, vector<int> >::iterator mit;
-	vector<int>::iterator vit;
+	map< Vertex, vector<Vertex> >::iterator mit;
+	vector<Vertex>::iterator vit;
 	
 	cout << endl << "Forward edges" << endl;
 	for (mit = fwd_edges.begin(); mit != fwd_edges.end(); mit++) {
-		cout << (mit->first)/*.id*/ << " -> ";
+		cout << (mit->first).id << " -> ";
 		for (vit = (mit->second).begin(); vit != (mit->second).end(); vit++) {
-			cout << *vit/*->id*/ << ", ";
+			cout << vit->id << ", ";
 		}
 		cout << endl;
 	}
+
 	cout << endl << "Backward edges" << endl;	
 	for (mit = back_edges.begin(); mit != back_edges.end(); mit++) {
-		cout << (mit->first)/*.id*/ << " -> ";
+		cout << (mit->first).id << " -> ";
 		for (vit = (mit->second).begin(); vit != (mit->second).end(); vit++) {
-			cout << *vit/*->id*/ << ", ";
+			cout << vit->id << ", ";
 		}
 		cout << endl;
 	}
 }
 
-int Graph::getARootNode() {
-	int result = -1;
-	unordered_map< int, vector<int> >::iterator mit;
+Vertex Graph::getARootNode() {
+	Vertex result(-1);
+	map< Vertex, vector<Vertex> >::iterator mit;
 	for (mit = back_edges.begin(); mit != back_edges.end(); mit++) {
 		if (mit->second.empty()) {
-			result = mit->first;
+			result = mit->first.id;
 			break;
 		}
 	}
 	return result;
 }
 
-void Graph::deleteRootNode(int id) {
-	vector<int> edges = fwd_edges[id];
-	vector<int>::iterator vit;
-	vector<int> temp;
+void Graph::deleteRootNode(Vertex a) {
+	vector<Vertex> edges = fwd_edges[a];
+	vector<Vertex>::iterator vit;
+	vector<Vertex> temp;
 	for (vit = edges.begin(); vit != edges.end(); vit++) {
 		temp = back_edges[*vit];
-		temp.erase(remove(temp.begin(), temp.end(), id), temp.end());
+		temp.erase(remove(temp.begin(), temp.end(), a), temp.end());
 		back_edges[*vit] = temp;
 	}
-	fwd_edges.erase(id);
-	back_edges.erase(id);
+	fwd_edges.erase(a);
+	back_edges.erase(a);
 }
 
 void topological_sort(Graph graph) {
-	int val;
+	Vertex val(-1);
 	while (!graph.isEmpty()) {
 		val = graph.getARootNode();
-		cout << val << " ";
+		cout << val.id << " ";
 		graph.deleteRootNode(val);
 	}
 	cout << endl;
@@ -113,17 +119,14 @@ void topological_sort(Graph graph) {
 int main() {
 	
 	Graph graph;
-	cout << graph.isEmpty() << endl;
-	/*
+	
 	Vertex a(0);
 	Vertex b(1);
 	Vertex c(2);
 	Vertex d(3);
 	Vertex e(4);
 	Vertex f(5);
-	*/
-	int a=0, b=1, c=2, d=3, e=4, f=5;
-
+	
 	graph.addVertex(a);
 	graph.addVertex(b);
 	graph.addVertex(c);
@@ -139,10 +142,10 @@ int main() {
 	graph.addEdge(d, e);
 	graph.addEdge(d, f);
 	graph.addEdge(e, f);
-	
 	graph.addEdge(c, b);
 
 	graph.display();
+	cout << endl << "Topological sorting" << endl;
 	topological_sort(graph);
 	
 	/*
