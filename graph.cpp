@@ -5,6 +5,7 @@
 
 using namespace std;
 
+// Class to store information at the vertices of the graph.
 class Vertex {
 	public:
 		int id;
@@ -14,6 +15,7 @@ class Vertex {
 			id = x;
 		}
 
+		// These overloaded operators are required so that a Vertex object can be used as a key in std::map
 		bool operator==(const Vertex& rhs) const {
 			return id == rhs.id;
 		}
@@ -24,10 +26,14 @@ class Vertex {
 };
 
 
+// This is the graph class
 class Graph {
 	private:
-		// adjacency lists for representation
+		// The directed graph is represented using two adjacency lists
+		//
+		// This map stores the outgoing edges of each vertex
 		map<Vertex, vector<Vertex> > fwd_edges;
+		// This map stores the incoming edges of each vertex
 		map<Vertex, vector<Vertex> > back_edges;
 
 	public:
@@ -39,6 +45,8 @@ class Graph {
 		void display();
 };
 
+
+// Add a new vertex to the graph
 void Graph::addVertex(Vertex id) {
 	vector<Vertex> temp;
 	fwd_edges.insert(make_pair(id, temp));
@@ -58,6 +66,8 @@ bool Graph::isEmpty() {
 	return fwd_edges.empty() && back_edges.empty();
 }
 
+
+// Utility function that displays contents of both maps
 void Graph::display() {
 	map< Vertex, vector<Vertex> >::iterator mit;
 	vector<Vertex>::iterator vit;
@@ -81,31 +91,41 @@ void Graph::display() {
 	}
 }
 
+// Returns the first root node (node with no incoming edges) from the graph or -1 if none is found
 Vertex Graph::getARootNode() {
 	Vertex result(-1);
 	map< Vertex, vector<Vertex> >::iterator mit;
+
+	// Use the back_edges map for quicker lookup of root node
 	for (mit = back_edges.begin(); mit != back_edges.end(); mit++) {
 		if (mit->second.empty()) {
-			result = mit->first.id;
+			result = mit->first;
 			break;
 		}
 	}
 	return result;
 }
 
+// Deletes a root node and its outgoing edges from the graph
 void Graph::deleteRootNode(Vertex a) {
+	// Get outgoing edges
 	vector<Vertex> edges = fwd_edges[a];
 	vector<Vertex>::iterator vit;
 	vector<Vertex> temp;
+	// Remove incoming edges from back_edges map
 	for (vit = edges.begin(); vit != edges.end(); vit++) {
 		temp = back_edges[*vit];
+		// erase-remove idiom
 		temp.erase(remove(temp.begin(), temp.end(), a), temp.end());
 		back_edges[*vit] = temp;
 	}
+	// Remove the vertex from both
 	fwd_edges.erase(a);
 	back_edges.erase(a);
 }
 
+// Print the vertices in sorted order by topological sort
+// Assumes that there are no cycles in the graph
 void topological_sort(Graph graph) {
 	Vertex val(-1);
 	while (!graph.isEmpty()) {
@@ -148,6 +168,7 @@ int main() {
 	cout << endl << "Topological sorting" << endl;
 	topological_sort(graph);
 	
+	// Some testing code below
 	/*
 	int root = graph.getARootNode();
 	cout << "Root node " << root << endl;
@@ -155,6 +176,6 @@ int main() {
 	graph.display();
 	root = graph.getARootNode();
 	cout << "Root node " << root << endl;
-*/
+	*/
 	return 0;
 }
